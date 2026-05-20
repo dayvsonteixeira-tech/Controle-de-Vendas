@@ -1,0 +1,1014 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Doceria — Controle de Vendas</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --bg: #fdf6ee;
+      --card: #fff9f2;
+      --accent: #c0392b;
+      --accent2: #e67e22;
+      --gold: #d4a017;
+      --text: #2c1a0e;
+      --muted: #8c6a50;
+      --border: #e8d5c0;
+      --success: #27ae60;
+      --danger: #e74c3c;
+      --shadow: 0 4px 24px rgba(44,26,14,0.10);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      font-family: 'DM Sans', sans-serif;
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* HEADER */
+    header {
+      background: var(--text);
+      padding: 2rem 2.5rem 1.5rem;
+      display: flex;
+      align-items: flex-end;
+      gap: 1.2rem;
+      border-bottom: 4px solid var(--gold);
+    }
+    header .logo-icon { font-size: 2.8rem; }
+    header h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 2rem;
+      color: #fff;
+      letter-spacing: -0.5px;
+    }
+    header h1 span { color: var(--gold); }
+    header p { color: #b39b82; font-size: 0.85rem; margin-top: 2px; }
+
+    /* MAIN LAYOUT */
+    main {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 2rem 1.5rem 4rem;
+    }
+
+    /* FORM CARD */
+    .form-card {
+      background: var(--card);
+      border: 1.5px solid var(--border);
+      border-radius: 16px;
+      padding: 2rem 2.2rem;
+      box-shadow: var(--shadow);
+      margin-bottom: 2.5rem;
+    }
+    .form-card h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.3rem;
+      color: var(--accent);
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1.2rem;
+    }
+    .form-group { display: flex; flex-direction: column; gap: 0.4rem; }
+    .form-group label {
+      font-size: 0.78rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: var(--muted);
+    }
+    .form-group input,
+    .form-group select {
+      padding: 0.75rem 1rem;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      background: #fff;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.95rem;
+      color: var(--text);
+      transition: border-color 0.2s, box-shadow 0.2s;
+      outline: none;
+    }
+    .form-group input:focus,
+    .form-group select:focus {
+      border-color: var(--accent2);
+      box-shadow: 0 0 0 3px rgba(230,126,34,0.12);
+    }
+    .form-group input[type="number"] { -moz-appearance: textfield; }
+    .form-group input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; }
+
+    .btn-add {
+      margin-top: 1.5rem;
+      padding: 0.85rem 2.2rem;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 9px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 1rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .btn-add:hover { background: #a93226; }
+    .btn-add:active { transform: scale(0.98); }
+
+    /* SUMMARY CARDS */
+    .summary-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 1rem;
+      margin-bottom: 2.5rem;
+    }
+    .summary-card {
+      background: var(--card);
+      border: 1.5px solid var(--border);
+      border-radius: 14px;
+      padding: 1.3rem 1.5rem;
+      box-shadow: var(--shadow);
+    }
+    .summary-card .sc-label {
+      font-size: 0.73rem;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: var(--muted);
+      font-weight: 500;
+    }
+    .summary-card .sc-value {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-top: 0.2rem;
+    }
+    .summary-card.highlight { background: var(--text); border-color: var(--gold); }
+    .summary-card.highlight .sc-label { color: #b39b82; }
+    .summary-card.highlight .sc-value { color: var(--gold); }
+
+    /* FILTER BAR */
+    .filter-bar {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1.2rem;
+      flex-wrap: wrap;
+    }
+    .filter-bar label { font-size: 0.82rem; font-weight: 500; color: var(--muted); }
+    .filter-bar select, .filter-bar input[type="month"] {
+      padding: 0.5rem 0.9rem;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      background: #fff;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.88rem;
+      color: var(--text);
+      outline: none;
+    }
+    .filter-bar select:focus, .filter-bar input[type="month"]:focus {
+      border-color: var(--accent2);
+    }
+
+    /* TABLE */
+    .table-wrap {
+      background: var(--card);
+      border: 1.5px solid var(--border);
+      border-radius: 16px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+    .table-wrap h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.2rem;
+      color: var(--text);
+      padding: 1.3rem 1.8rem 1rem;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    table { width: 100%; border-collapse: collapse; }
+    thead tr { background: var(--text); }
+    thead th {
+      padding: 0.9rem 1.1rem;
+      text-align: left;
+      font-size: 0.73rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.9px;
+      color: #b39b82;
+    }
+    tbody tr {
+      border-bottom: 1px solid var(--border);
+      transition: background 0.15s;
+    }
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: #fdf0e0; }
+    tbody td { padding: 0.85rem 1.1rem; font-size: 0.9rem; vertical-align: middle; }
+
+    .badge {
+      display: inline-block;
+      padding: 0.25rem 0.75rem;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 500;
+    }
+    .badge-bolo    { background: #fce4e4; color: #c0392b; }
+    .badge-brownie { background: #3d2b1f; color: #f5cba7; }
+    .badge-bombom  { background: #f9d3e8; color: #8e3566; }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      padding: 0.25rem 0.75rem;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 500;
+    }
+    .status-pending  { background: #fef3cd; color: #856404; }
+    .status-today    { background: #f8d7da; color: #842029; font-weight: 700; animation: pulse 1.5s infinite; }
+    .status-overdue  { background: #f8d7da; color: #842029; }
+    .status-paid     { background: #d1e7dd; color: #0f5132; }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.65; }
+    }
+
+    .btn-delete {
+      background: none;
+      border: 1.5px solid var(--border);
+      border-radius: 7px;
+      color: var(--muted);
+      cursor: pointer;
+      padding: 0.3rem 0.6rem;
+      font-size: 0.85rem;
+      transition: all 0.15s;
+    }
+    .btn-delete:hover { background: #f8d7da; border-color: var(--danger); color: var(--danger); }
+
+    .btn-pago {
+      background: none;
+      border: 1.5px solid var(--border);
+      border-radius: 7px;
+      color: var(--muted);
+      cursor: pointer;
+      padding: 0.3rem 0.7rem;
+      font-size: 0.8rem;
+      transition: all 0.15s;
+      margin-right: 4px;
+    }
+    .btn-pago:hover { background: #d1e7dd; border-color: var(--success); color: var(--success); }
+
+    /* AGRUPAMENTO DE CLIENTE */
+    tr.grupo-header td {
+      background: #fdf0e0;
+      border-top: 2px solid var(--accent2);
+      font-size: 0.82rem;
+      padding: 0.5rem 1.1rem;
+      color: var(--muted);
+      font-weight: 600;
+      letter-spacing: 0.4px;
+    }
+    tr.grupo-subtotal td {
+      background: #fef9f0;
+      border-top: 1px dashed var(--border);
+      border-bottom: 2px solid var(--accent2);
+      font-weight: 700;
+      font-size: 0.88rem;
+      color: var(--text);
+    }
+    tr.grupo-subtotal .subtotal-valor {
+      color: var(--accent2);
+      font-family: 'Playfair Display', serif;
+      font-size: 1rem;
+    }
+    /* Linha total por cliente (todas as datas) */
+    tr.cliente-total td {
+      background: #fff3e0;
+      border-top: 1px solid var(--accent2);
+      border-bottom: 3px solid var(--accent);
+      font-weight: 700;
+      font-size: 0.9rem;
+    }
+    tr.cliente-total .ct-valor {
+      color: var(--accent);
+      font-family: 'Playfair Display', serif;
+      font-size: 1.05rem;
+    }
+    /* Linha total geral */
+    tr.total-geral td {
+      background: var(--text);
+      color: #fff;
+      font-weight: 700;
+      font-size: 0.95rem;
+      padding: 1rem 1.1rem;
+    }
+    tr.total-geral .tg-valor {
+      color: var(--gold);
+      font-family: 'Playfair Display', serif;
+      font-size: 1.2rem;
+    }
+
+    /* Mobile: card agrupado */
+    .grupo-mobile {
+      border: 2px solid var(--accent2);
+      border-radius: 14px;
+      overflow: hidden;
+      margin-bottom: 1rem;
+      box-shadow: 0 3px 12px rgba(230,126,34,0.10);
+    }
+    .grupo-mobile-header {
+      background: #fdf0e0;
+      padding: 0.7rem 1.1rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border);
+    }
+    .grupo-mobile-header .gm-nome {
+      font-weight: 700;
+      font-size: 1rem;
+      color: var(--text);
+    }
+    .grupo-mobile-header .gm-data {
+      font-size: 0.78rem;
+      color: var(--muted);
+    }
+    .grupo-mobile-itens { padding: 0.5rem 0.8rem; display: flex; flex-direction: column; gap: 0.5rem; }
+    .grupo-mobile-subtotal {
+      background: #fef9f0;
+      border-top: 1px dashed var(--border);
+      padding: 0.7rem 1.1rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .grupo-mobile-subtotal .st-label { font-size: 0.78rem; color: var(--muted); font-weight: 600; }
+    .grupo-mobile-subtotal .st-valor { font-family: 'Playfair Display', serif; font-size: 1.1rem; font-weight: 700; color: var(--accent2); }
+
+    /* Total por cliente (mobile) */
+    .cliente-total-mobile {
+      background: #fff3e0;
+      border: 2px solid var(--accent);
+      border-radius: 12px;
+      padding: 0.9rem 1.2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: -0.5rem;
+      margin-bottom: 0.3rem;
+    }
+    .cliente-total-mobile .ct-nome { font-size: 0.82rem; color: var(--muted); font-weight: 600; }
+    .cliente-total-mobile .ct-val  { font-family: 'Playfair Display', serif; font-size: 1.1rem; font-weight: 700; color: var(--accent); }
+
+    /* Total geral (mobile) */
+    .total-geral-mobile {
+      background: var(--text);
+      border-radius: 14px;
+      padding: 1.1rem 1.4rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 0.5rem;
+      box-shadow: var(--shadow);
+    }
+    .total-geral-mobile .tg-label { font-size: 0.85rem; color: #b39b82; font-weight: 600; }
+    .total-geral-mobile .tg-val   { font-family: 'Playfair Display', serif; font-size: 1.4rem; font-weight: 700; color: var(--gold); }
+      padding: 3.5rem 1rem;
+      color: var(--muted);
+    }
+    .empty-state .es-icon { font-size: 3rem; margin-bottom: 0.8rem; }
+    .empty-state p { font-size: 0.95rem; }
+
+    /* ALERT MODAL */
+    .modal-overlay {
+      display: none;
+      position: fixed; inset: 0;
+      background: rgba(44,26,14,0.55);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal-overlay.active { display: flex; }
+    .modal {
+      background: #fff;
+      border-radius: 18px;
+      padding: 2.5rem 2rem;
+      max-width: 420px;
+      width: 90%;
+      text-align: center;
+      box-shadow: 0 20px 60px rgba(44,26,14,0.25);
+      animation: popIn 0.3s ease;
+    }
+    @keyframes popIn {
+      from { transform: scale(0.85); opacity: 0; }
+      to   { transform: scale(1); opacity: 1; }
+    }
+    .modal .bell { font-size: 3.2rem; margin-bottom: 0.6rem; }
+    .modal h3 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.5rem;
+      color: var(--accent);
+      margin-bottom: 0.8rem;
+    }
+    .modal p { color: var(--muted); font-size: 0.92rem; line-height: 1.6; }
+    .modal ul { list-style: none; margin: 1rem 0; text-align: left; }
+    .modal ul li {
+      padding: 0.5rem 0.8rem;
+      background: #fdf6ee;
+      border-left: 3px solid var(--accent);
+      border-radius: 4px;
+      margin-bottom: 0.5rem;
+      font-size: 0.88rem;
+      color: var(--text);
+    }
+    .btn-close-modal {
+      margin-top: 1rem;
+      padding: 0.75rem 2rem;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 9px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .btn-close-modal:hover { background: #a93226; }
+
+    /* FOOTER */
+    footer {
+      text-align: center;
+      padding: 1.5rem;
+      color: var(--muted);
+      font-size: 0.78rem;
+    }
+
+    @media (max-width: 700px) {
+      header { padding: 1.2rem 1rem; }
+      header h1 { font-size: 1.4rem; }
+      main { padding: 1.2rem 0.8rem 3rem; }
+      .form-card { padding: 1.3rem 1rem; }
+
+      /* Esconde a tabela no mobile */
+      .table-wrap table { display: none; }
+
+      /* Mostra os cards mobile */
+      .mobile-cards { display: flex; flex-direction: column; gap: 0.8rem; padding: 1rem; }
+
+      .venda-card {
+        background: #fff;
+        border: 1.5px solid var(--border);
+        border-radius: 12px;
+        padding: 1rem 1.1rem;
+        box-shadow: 0 2px 10px rgba(44,26,14,0.07);
+      }
+      .venda-card-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 0.7rem;
+      }
+      .venda-card-header .nome {
+        font-weight: 700;
+        font-size: 1rem;
+        color: var(--text);
+      }
+      .venda-card-body {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.5rem 1rem;
+        margin-bottom: 0.8rem;
+      }
+      .venda-card-body .item { display: flex; flex-direction: column; gap: 2px; }
+      .venda-card-body .item .lbl {
+        font-size: 0.68rem;
+        text-transform: uppercase;
+        letter-spacing: 0.7px;
+        color: var(--muted);
+        font-weight: 500;
+      }
+      .venda-card-body .item .val {
+        font-size: 0.9rem;
+        color: var(--text);
+        font-weight: 500;
+      }
+      .venda-card-body .item .val.destaque {
+        font-size: 1rem;
+        font-weight: 700;
+        color: var(--accent2);
+      }
+      .venda-card-footer {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding-top: 0.7rem;
+        border-top: 1px solid var(--border);
+      }
+      .venda-card-acoes { display: flex; gap: 0.5rem; }
+
+      /* Filtros empilhados no mobile */
+      .filter-bar { flex-direction: column; align-items: flex-start; gap: 0.6rem; }
+      .filter-bar select, .filter-bar input[type="month"] { width: 100%; }
+    }
+
+    /* Desktop: esconde os cards mobile */
+    @media (min-width: 701px) {
+      .mobile-cards { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="logo-icon">🍫</div>
+  <div>
+    <h1>Doce <span>Controle</span></h1>
+    <p>Sistema de Gestão de Vendas • Doceria</p>
+  </div>
+</header>
+
+<!-- ALERT MODAL -->
+<div class="modal-overlay" id="alertModal">
+  <div class="modal">
+    <div class="bell">🔔</div>
+    <h3>Pagamento Hoje!</h3>
+    <p>Os seguintes clientes têm pagamento vencendo <strong>hoje</strong>:</p>
+    <ul id="alertList"></ul>
+    <button class="btn-close-modal" onclick="closeModal()">Entendido</button>
+  </div>
+</div>
+
+<main>
+
+  <!-- FORM -->
+  <div class="form-card">
+    <h2>✦ Nova Venda</h2>
+    <div class="form-grid">
+      <div class="form-group">
+        <label>Nome do Cliente</label>
+        <input type="text" id="nomeCliente" placeholder="Ex: Maria Silva" />
+      </div>
+      <div class="form-group">
+        <label>Produto</label>
+        <select id="produto">
+          <option value="">Selecione...</option>
+          <option value="Bolo">🎂 Bolo</option>
+          <option value="Brownie">🍫 Brownie</option>
+          <option value="Bombom de Pote">🍮 Bombom de Pote</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Quantidade</label>
+        <input type="number" id="quantidade" placeholder="1" min="1" value="1" />
+      </div>
+      <div class="form-group">
+        <label>Valor (R$)</label>
+        <input type="number" id="valor" placeholder="0,00" step="0.01" min="0" />
+      </div>
+      <div class="form-group">
+        <label>Data da Venda</label>
+        <input type="date" id="dataVenda" />
+      </div>
+      <div class="form-group">
+        <label>Data do Pagamento</label>
+        <input type="date" id="dataPagamento" />
+      </div>
+    </div>
+    <button class="btn-add" onclick="adicionarVenda()">
+      ＋ Adicionar Venda
+    </button>
+  </div>
+
+  <!-- SUMMARY -->
+  <div class="summary-row" id="summaryRow">
+    <div class="summary-card">
+      <div class="sc-label">Total de Vendas</div>
+      <div class="sc-value" id="sumTotal">0</div>
+    </div>
+    <div class="summary-card">
+      <div class="sc-label">Vendas Pendentes</div>
+      <div class="sc-value" id="sumPendente">0</div>
+    </div>
+    <div class="summary-card">
+      <div class="sc-label">Vendas Pagas</div>
+      <div class="sc-value" id="sumPago">0</div>
+    </div>
+    <div class="summary-card highlight">
+      <div class="sc-label">💰 A Receber no Mês</div>
+      <div class="sc-value" id="sumMes">R$ 0,00</div>
+    </div>
+  </div>
+
+  <!-- TABLE -->
+  <div class="filter-bar">
+    <label>Filtrar por mês de pagamento:</label>
+    <input type="month" id="filtroMes" onchange="renderTabela()" />
+    <label>Produto:</label>
+    <select id="filtroProduto" onchange="renderTabela()">
+      <option value="">Todos</option>
+      <option value="Bolo">Bolo</option>
+      <option value="Brownie">Brownie</option>
+      <option value="Bombom de Pote">Bombom de Pote</option>
+    </select>
+    <label>Status:</label>
+    <select id="filtroStatus" onchange="renderTabela()">
+      <option value="">Todos</option>
+      <option value="pendente">Pendente</option>
+      <option value="pago">Pago</option>
+      <option value="hoje">Vence Hoje</option>
+    </select>
+  </div>
+
+  <div class="table-wrap">
+    <h2>📋 Registro de Vendas</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Cliente</th>
+          <th>Produto</th>
+          <th>Qtd</th>
+          <th>Valor</th>
+          <th>Total</th>
+          <th>Data Venda</th>
+          <th>Pagamento</th>
+          <th>Status</th>
+          <th>Ações</th>
+        </tr>
+      </thead>
+      <tbody id="tabelaBody">
+      </tbody>
+    </table>
+    <div class="mobile-cards" id="mobileCards"></div>
+    <div class="empty-state" id="emptyState" style="display:none">
+      <div class="es-icon">🍬</div>
+      <p>Nenhuma venda registrada ainda.<br>Adicione sua primeira venda acima!</p>
+    </div>
+  </div>
+
+</main>
+
+<footer>Doce Controle © 2025 — Gestão de Vendas para Doceria</footer>
+
+<script>
+  // ── DATA ──────────────────────────────────────────────────────────
+  let vendas = JSON.parse(localStorage.getItem('doce_vendas') || '[]');
+
+  function salvar() {
+    localStorage.setItem('doce_vendas', JSON.stringify(vendas));
+  }
+
+  function hoje() {
+    return new Date().toISOString().split('T')[0];
+  }
+
+  // Set default dates
+  document.getElementById('dataVenda').value = hoje();
+
+  // ── ADD VENDA ─────────────────────────────────────────────────────
+  function adicionarVenda() {
+    const nome     = document.getElementById('nomeCliente').value.trim();
+    const produto  = document.getElementById('produto').value;
+    const qtd      = parseInt(document.getElementById('quantidade').value) || 1;
+    const valor    = parseFloat(document.getElementById('valor').value) || 0;
+    const dVenda   = document.getElementById('dataVenda').value;
+    const dPag     = document.getElementById('dataPagamento').value;
+
+    if (!nome)    return alert('Por favor, informe o nome do cliente.');
+    if (!produto) return alert('Selecione um produto.');
+    if (!valor)   return alert('Informe o valor da venda.');
+    if (!dVenda)  return alert('Selecione a data da venda.');
+    if (!dPag)    return alert('Selecione a data de pagamento.');
+
+    vendas.push({
+      id: Date.now(),
+      nome, produto, qtd, valor, dVenda, dPag,
+      pago: false
+    });
+
+    salvar();
+    renderTabela();
+    renderSummary();
+
+    // Clear fields
+    document.getElementById('nomeCliente').value = '';
+    document.getElementById('produto').value = '';
+    document.getElementById('quantidade').value = '1';
+    document.getElementById('valor').value = '';
+    document.getElementById('dataPagamento').value = '';
+  }
+
+  // ── MARK PAID ─────────────────────────────────────────────────────
+  function marcarPago(id) {
+    const v = vendas.find(x => x.id === id);
+    if (v) { v.pago = !v.pago; salvar(); renderTabela(); renderSummary(); }
+  }
+
+  // ── DELETE ────────────────────────────────────────────────────────
+  function deletar(id) {
+    if (!confirm('Remover esta venda?')) return;
+    vendas = vendas.filter(x => x.id !== id);
+    salvar(); renderTabela(); renderSummary();
+  }
+
+  // ── STATUS ────────────────────────────────────────────────────────
+  function getStatus(v) {
+    if (v.pago) return 'pago';
+    if (v.dPag === hoje()) return 'hoje';
+    if (v.dPag < hoje()) return 'vencido';
+    return 'pendente';
+  }
+
+  function statusBadge(v) {
+    const s = getStatus(v);
+    if (s === 'pago')    return `<span class="status-badge status-paid">✓ Pago</span>`;
+    if (s === 'hoje')    return `<span class="status-badge status-today">🔔 Hoje!</span>`;
+    if (s === 'vencido') return `<span class="status-badge status-overdue">⚠ Vencido</span>`;
+    return `<span class="status-badge status-pending">⏳ Pendente</span>`;
+  }
+
+  function produtoBadge(p) {
+    if (p === 'Bolo')         return `<span class="badge badge-bolo">🎂 Bolo</span>`;
+    if (p === 'Brownie')      return `<span class="badge badge-brownie">🍫 Brownie</span>`;
+    if (p === 'Bombom de Pote') return `<span class="badge badge-bombom">🍮 Bombom</span>`;
+    return p;
+  }
+
+  function fmt(n) {
+    return 'R$ ' + n.toFixed(2).replace('.', ',');
+  }
+
+  function fmtDate(d) {
+    if (!d) return '—';
+    const [y, m, dd] = d.split('-');
+    return `${dd}/${m}/${y}`;
+  }
+
+  // ── AGRUPAR por cliente (todas as datas), sub-agrupar por data ───
+  function agruparPorCliente(lista) {
+    const clientes = {};
+    lista.forEach(v => {
+      const chaveCliente = v.nome.toLowerCase().trim();
+      if (!clientes[chaveCliente]) clientes[chaveCliente] = { nome: v.nome, dias: {} };
+      const chaveDia = v.dVenda;
+      if (!clientes[chaveCliente].dias[chaveDia]) clientes[chaveCliente].dias[chaveDia] = [];
+      clientes[chaveCliente].dias[chaveDia].push(v);
+    });
+    // Ordena clientes pelo status do primeiro item mais urgente
+    const order = { hoje: 0, vencido: 1, pendente: 2, pago: 3 };
+    return Object.values(clientes).sort((a, b) => {
+      const allA = Object.values(a.dias).flat();
+      const allB = Object.values(b.dias).flat();
+      const sa = allA.map(getStatus).sort((x,y) => order[x]-order[y])[0];
+      const sb = allB.map(getStatus).sort((x,y) => order[x]-order[y])[0];
+      return (order[sa]||99) - (order[sb]||99);
+    });
+  }
+
+  // ── RENDER TABLE ──────────────────────────────────────────────────
+  function renderTabela() {
+    const filtroMes     = document.getElementById('filtroMes').value;
+    const filtroProduto = document.getElementById('filtroProduto').value;
+    const filtroStatus  = document.getElementById('filtroStatus').value;
+
+    let lista = [...vendas];
+    if (filtroMes)      lista = lista.filter(v => v.dPag && v.dPag.startsWith(filtroMes));
+    if (filtroProduto)  lista = lista.filter(v => v.produto === filtroProduto);
+    if (filtroStatus === 'pendente') lista = lista.filter(v => !v.pago && v.dPag !== hoje() && v.dPag >= hoje());
+    if (filtroStatus === 'pago')     lista = lista.filter(v => v.pago);
+    if (filtroStatus === 'hoje')     lista = lista.filter(v => !v.pago && v.dPag === hoje());
+
+    const clientes = agruparPorCliente(lista);
+    const tbody      = document.getElementById('tabelaBody');
+    const mobileCards = document.getElementById('mobileCards');
+    const empty      = document.getElementById('emptyState');
+
+    if (lista.length === 0) {
+      tbody.innerHTML = '';
+      mobileCards.innerHTML = '';
+      empty.style.display = 'block';
+    } else {
+      empty.style.display = 'none';
+      const totalGeral = lista.reduce((s, v) => s + v.valor * v.qtd, 0);
+
+      // ── DESKTOP ──────────────────────────────────────────────────
+      let rows = '';
+      let num  = 1;
+
+      clientes.forEach(c => {
+        const todosItens  = Object.values(c.dias).flat();
+        const totalCliente = todosItens.reduce((s, v) => s + v.valor * v.qtd, 0);
+        const dias = Object.keys(c.dias).sort();
+
+        // Cabeçalho do cliente
+        rows += `<tr class="grupo-header">
+          <td colspan="10">
+            👤 <strong>${c.nome}</strong>
+            &nbsp;·&nbsp; ${todosItens.length} venda(s)
+            &nbsp;·&nbsp; ${dias.length} dia(s)
+          </td>
+        </tr>`;
+
+        dias.forEach(dia => {
+          const itens = c.dias[dia];
+          const totalDia = itens.reduce((s, v) => s + v.valor * v.qtd, 0);
+
+          itens.forEach(v => {
+            rows += `<tr>
+              <td style="color:var(--muted);font-size:0.8rem">${num++}</td>
+              <td>${v.nome}</td>
+              <td>${produtoBadge(v.produto)}</td>
+              <td>${v.qtd}</td>
+              <td>${fmt(v.valor)}</td>
+              <td><strong>${fmt(v.valor * v.qtd)}</strong></td>
+              <td>${fmtDate(v.dVenda)}</td>
+              <td>${fmtDate(v.dPag)}</td>
+              <td>${statusBadge(v)}</td>
+              <td>
+                <button class="btn-pago" onclick="marcarPago(${v.id})" title="${v.pago ? 'Desfazer' : 'Marcar pago'}">
+                  ${v.pago ? '↩' : '✓'}
+                </button>
+                <button class="btn-delete" onclick="deletar(${v.id})" title="Remover">🗑</button>
+              </td>
+            </tr>`;
+          });
+
+          // Subtotal do dia (só se mais de 1 item naquele dia)
+          if (itens.length > 1) {
+            rows += `<tr class="grupo-subtotal">
+              <td colspan="5" style="text-align:right;padding-right:1.5rem;color:var(--muted);font-size:0.78rem;">
+                Subtotal ${fmtDate(dia)}:
+              </td>
+              <td colspan="5"><span class="subtotal-valor">${fmt(totalDia)}</span></td>
+            </tr>`;
+          }
+        });
+
+        // Total do cliente (sempre)
+        rows += `<tr class="cliente-total">
+          <td colspan="5" style="text-align:right;padding-right:1.5rem;color:var(--accent);font-size:0.85rem;">
+            💰 Total de <strong>${c.nome}</strong>:
+          </td>
+          <td colspan="5"><span class="ct-valor">${fmt(totalCliente)}</span></td>
+        </tr>`;
+      });
+
+      // Total geral
+      rows += `<tr class="total-geral">
+        <td colspan="5" style="text-align:right;padding-right:1.5rem;font-size:0.9rem;color:#b39b82;">
+          🏆 TOTAL GERAL VENDIDO:
+        </td>
+        <td colspan="5"><span class="tg-valor">${fmt(totalGeral)}</span></td>
+      </tr>`;
+
+      tbody.innerHTML = rows;
+
+      // ── MOBILE ───────────────────────────────────────────────────
+      let mobileHtml = '';
+
+      clientes.forEach(c => {
+        const todosItens   = Object.values(c.dias).flat();
+        const totalCliente = todosItens.reduce((s, v) => s + v.valor * v.qtd, 0);
+        const dias = Object.keys(c.dias).sort();
+
+        // Cards por dia
+        const diasHtml = dias.map(dia => {
+          const itens = c.dias[dia];
+          const totalDia = itens.reduce((s, v) => s + v.valor * v.qtd, 0);
+
+          const itensHtml = itens.map(v => `
+            <div class="venda-card" style="margin:0;border:1px solid var(--border);border-radius:9px;">
+              <div class="venda-card-header">
+                <span>${produtoBadge(v.produto)}</span>
+                ${statusBadge(v)}
+              </div>
+              <div class="venda-card-body" style="margin-top:0.5rem;">
+                <div class="item">
+                  <span class="lbl">Qtd</span>
+                  <span class="val">${v.qtd} un.</span>
+                </div>
+                <div class="item">
+                  <span class="lbl">Valor Unit.</span>
+                  <span class="val">${fmt(v.valor)}</span>
+                </div>
+                <div class="item">
+                  <span class="lbl">Subtotal</span>
+                  <span class="val destaque">${fmt(v.valor * v.qtd)}</span>
+                </div>
+                <div class="item">
+                  <span class="lbl">Pagamento</span>
+                  <span class="val">💳 ${fmtDate(v.dPag)}</span>
+                </div>
+              </div>
+              <div class="venda-card-footer">
+                <div class="venda-card-acoes">
+                  <button class="btn-pago" onclick="marcarPago(${v.id})">
+                    ${v.pago ? '↩ Desfazer' : '✓ Marcar Pago'}
+                  </button>
+                  <button class="btn-delete" onclick="deletar(${v.id})">🗑 Excluir</button>
+                </div>
+              </div>
+            </div>
+          `).join('');
+
+          return `
+            <div class="grupo-mobile" style="margin-bottom:0.5rem;">
+              <div class="grupo-mobile-header">
+                <span class="gm-nome">👤 ${c.nome}</span>
+                <span class="gm-data">📅 ${fmtDate(dia)}</span>
+              </div>
+              <div class="grupo-mobile-itens">${itensHtml}</div>
+              ${itens.length > 1 ? `
+              <div class="grupo-mobile-subtotal">
+                <span class="st-label">Subtotal do dia</span>
+                <span class="st-valor">${fmt(totalDia)}</span>
+              </div>` : ''}
+            </div>`;
+        }).join('');
+
+        mobileHtml += diasHtml;
+
+        // Total do cliente
+        mobileHtml += `
+          <div class="cliente-total-mobile">
+            <span class="ct-nome">💰 Total de ${c.nome} (${dias.length} dia(s))</span>
+            <span class="ct-val">${fmt(totalCliente)}</span>
+          </div>`;
+      });
+
+      // Total geral
+      mobileHtml += `
+        <div class="total-geral-mobile">
+          <span class="tg-label">🏆 Total Geral Vendido</span>
+          <span class="tg-val">${fmt(totalGeral)}</span>
+        </div>`;
+
+      mobileCards.innerHTML = mobileHtml;
+    }
+
+    renderSummary(lista, filtroMes);
+  }
+
+  // ── SUMMARY ───────────────────────────────────────────────────────
+  function renderSummary(lista, filtroMes) {
+    // Always compute from all vendas for global stats
+    const total    = vendas.length;
+    const pendente = vendas.filter(v => !v.pago).length;
+    const pago     = vendas.filter(v => v.pago).length;
+
+    // A receber no mês: sum of (unpaid) vendas with dPag in selected month (or current month)
+    const mesRef = filtroMes || hoje().substring(0, 7);
+    const aReceber = vendas
+      .filter(v => !v.pago && v.dPag && v.dPag.startsWith(mesRef))
+      .reduce((acc, v) => acc + v.valor * v.qtd, 0);
+
+    document.getElementById('sumTotal').textContent    = total;
+    document.getElementById('sumPendente').textContent = pendente;
+    document.getElementById('sumPago').textContent     = pago;
+    document.getElementById('sumMes').textContent      = fmt(aReceber);
+  }
+
+  // ── ALERT: vence hoje ─────────────────────────────────────────────
+  function checkAlerts() {
+    const venceHoje = vendas.filter(v => !v.pago && v.dPag === hoje());
+    if (venceHoje.length === 0) return;
+
+    const list = document.getElementById('alertList');
+    list.innerHTML = venceHoje.map(v =>
+      `<li><strong>${v.nome}</strong> — ${v.produto} — ${fmt(v.valor * v.qtd)}</li>`
+    ).join('');
+
+    document.getElementById('alertModal').classList.add('active');
+  }
+
+  function closeModal() {
+    document.getElementById('alertModal').classList.remove('active');
+  }
+
+  // Close modal clicking outside
+  document.getElementById('alertModal').addEventListener('click', function(e) {
+    if (e.target === this) closeModal();
+  });
+
+  // ── INIT ──────────────────────────────────────────────────────────
+  renderTabela();
+  checkAlerts();
+</script>
+</body>
+</html>
